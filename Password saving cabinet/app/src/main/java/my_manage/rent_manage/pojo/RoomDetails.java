@@ -55,7 +55,6 @@ public class RoomDetails {
     /**
      * 物业费单价
      */
-    @Setter@Getter
     private int propertyPrice;
     /**
      * 月租金

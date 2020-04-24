@@ -15,8 +15,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.fastjson.JSON;
 
-import java.util.Calendar;
-
 import my_manage.password_box.R;
 import my_manage.rent_manage.pojo.show.ShowRoomDetails;
 import my_manage.tool.StrUtils;
@@ -112,14 +110,9 @@ public final class NewRoom extends AppCompatActivity {
         tel.setText(room.getPersonDetails()==null?"":room.getPersonDetails().getTel());
         manCard.setText(room.getPersonDetails()==null?"":room.getPersonDetails().getCord());
         isContainRealty.setChecked(room.getRentalRecord()==null?false:room.getRentalRecord().getIsContainRealty());
-        beginDate.setText(date2String(room.getRentalRecord().getStartDate()));
-        endDate
-        proBeginDate
-        proEndDate
-    }
-
-    private String date2String(Calendar date) {
-        if(date==null   )return "";
-        return date.get(Calendar.YEAR)
+//        beginDate
+//        endDate
+//        proBeginDate
+//        proEndDate
     }
 }

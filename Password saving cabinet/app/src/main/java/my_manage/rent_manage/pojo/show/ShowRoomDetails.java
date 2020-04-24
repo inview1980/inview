@@ -2,13 +2,14 @@ package my_manage.rent_manage.pojo.show;
 
 import java.util.Calendar;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import my_manage.rent_manage.pojo.PersonDetails;
 import my_manage.rent_manage.pojo.RentalRecord;
 import my_manage.rent_manage.pojo.RoomDetails;
 
-@Data
+@Getter@Setter
 @NoArgsConstructor
 public final class ShowRoomDetails extends RoomDetails {
     private RentalRecord rentalRecord;
