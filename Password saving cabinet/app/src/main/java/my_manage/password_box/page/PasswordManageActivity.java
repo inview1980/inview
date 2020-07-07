@@ -1,139 +1,136 @@
 package my_manage.password_box.page;
 
-import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
-import my_manage.adapter.UserItemAdapter;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.classic.adapter.BaseAdapterHelper;
+import com.classic.adapter.CommonAdapter;
+
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnItemClick;
+import my_manage.iface.IShowList;
 import my_manage.password_box.R;
-import my_manage.password_box.database.PasswordDB;
-import my_manage.password_box.menuEnum.PwdContentMenuEnum;
-import my_manage.password_box.menuEnum.PwdContextActivityLongClickEnum;
-import my_manage.tool.EnumUtils;
+import my_manage.password_box.listener.PasswordManageActivityListener;
+import my_manage.password_box.pojo.UserItem;
+import my_manage.rent_manage.pojo.show.MenuData;
+import my_manage.tool.MenuUtils;
+import my_manage.tool.PageUtils;
+import my_manage.tool.database.DbHelper;
+import my_manage.tool.enums.MenuTypesEnum;
+import my_manage.widght.MyBaseSwipeBackActivity;
+import my_manage.widght.ParallaxSwipeBackActivity;
 
 
-public final class PasswordManageActivity extends AppCompatActivity {
-    private ListView listView;
-    @SuppressLint("StaticFieldLeak")
-    public static boolean isDBChanged = false;
+public final class PasswordManageActivity extends MyBaseSwipeBackActivity implements IShowList {
+    @BindView(R.id.main_ListViewId) SwipeMenuListView listView;
+    @BindView(R.id.main_viewId)     RelativeLayout    mainViewId;
+    private                         List<UserItem>    itemList;
+    private                         int               passwordTypeId;
+    private String title;
 
     @Override
     protected void onStart() {
         super.onStart();
-        isNeedSaveDB();
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_listview);
+        ButterKnife.bind(this);
 
-        init();
+        passwordTypeId = getIntent().getIntExtra("PasswordTypeId", 0);
+         title =DbHelper.getInstance().getMenuTypes(this, MenuTypesEnum.PasswordType)
+                .stream().filter(item->item.getPrimary_id()==passwordTypeId).findFirst().orElse(new MenuData()).getTitle();
+
+        //初始化Toolbar控件
+        setTitle(title);
+
+        initListView();
     }
 
-    private void init() {
-        listView = findViewById(R.id.main_ListViewId);
-        setTitle("密码明细");
-
-        //listView单击事件
-        listView.setOnItemClickListener((adV, v, position, l) -> PwdContextActivityLongClickEnum.Edit.run(this, position));
-
-        //ListView所有 item长按事件，弹出菜单
-        listView.setOnItemLongClickListener((AdapterView<?> adapterView, View view, int position, long l) ->
-                EnumUtils.menuInit(this, PwdContextActivityLongClickEnum.Delete, view, position));
-
-        //按键单击事件，弹出菜单
-        findViewById(R.id.main_add_btn).setOnClickListener(v ->
-                EnumUtils.menuInit(this, PwdContentMenuEnum.Add, v, -1));
-        showLst();
+    private void initListView() {
+        SwipeMenuCreator creator = menu -> {
+            // create "删除项目" item
+            PageUtils.getSwipeMenuItem(this, menu, "删除", Color.rgb(0xF9, 0x3F, 0x25), R.drawable.ic_delete_black_24dp);
+        };
+        listView.setMenuCreator(creator);
+        listView.setOnMenuItemClickListener((position, menu, index) -> {
+            if (index == 0) {// delete
+                PasswordManageActivityListener.deleteItem(PasswordManageActivity.this, itemList.get(position));
+            }
+            return false;
+        });
     }
+
+    /**
+     * listView单击事件
+     */
+    @OnItemClick(R.id.main_ListViewId)
+    void OnItemClickListener(AdapterView<?> adv, View v, int position, long l) {
+        Intent intent = new Intent(this, PasswordManageViewPagerHome.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("currentItem", position);
+        bundle.putInt("PasswordTypeId", itemList.get(position).getTypeNameId());
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        //显示菜单中的图标
+        MenuUtils.setIconVisibe(featureId, menu);
+        return super.onMenuOpened(featureId, menu);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.pwd_manage_activity_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        PasswordManageActivityListener.onOptionsItemSelected(this, item.getItemId(), title);
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showList();
+    }
+
 
     /**
      * 重新载入列表
      */
-    public void showLst() {
-        UserItemAdapter adapter = new UserItemAdapter(this, PasswordDB.init().getItems());
-        Log.i(this.getLocalClassName(), PasswordDB.init().getItems().toString());
-        listView.setAdapter(adapter);
-
-        isNeedSaveDB();
-    }
-
     @Override
-    protected void onDestroy() {
-        isNeedSaveDB();
-        super.onDestroy();
-    }
-
-    private void isNeedSaveDB() {
-        //保存数据库文件
-        if (isDBChanged) {
-            if (PasswordDB.init().save()) {
-                isDBChanged = false;
-                showMessage("保存数据库成功");
-            } else {
-                showMessage("保存数据库失败");
+    public void showList() {
+        itemList = DbHelper.getInstance().getItemsByAfter(this, passwordTypeId);
+        listView.setAdapter(new CommonAdapter<UserItem>(this, R.layout.password_manage_list_item, itemList) {
+            @Override
+            public void onUpdate(BaseAdapterHelper helper, UserItem item, int position) {
+                helper.setText(R.id.pwd_ItemId, item.getItemName())
+                        .setText(R.id.pwd_AddressId, item.getAddress())
+                        .setText(R.id.pwd_UserNameId, item.getUserName())
+                        .setText(R.id.pwd_PasswordId, item.getPassword());
             }
-        }
+        });
     }
-
-
-    public void showMessage(String msg) {
-        Toast.makeText(getBaseContext(), msg, Toast.LENGTH_SHORT).show();
-        Log.i(this.getLocalClassName(), msg);
-    }
-
-
-    //region Description
-    //    @Override
-//    public void onClick(View view) {
-//        EnumUtils.menuInit(this, PwdContentMenuEnum.Add, view, -1);
-//        //初始化菜单
-//        PopupMenu clickMenu = new PopupMenu(this, view);
-//        for (PwdContentMenuEnum value : PwdContentMenuEnum.values()) {
-//            clickMenu.getMenu().add(0, value.getIndex(), Menu.NONE, value.getName());
-//        }
-//        // menu的item点击事件
-//        clickMenu.setOnMenuItemClickListener(item -> {
-//            PwdContentMenuEnum.getEnum(item.getItemId()).run(this, -1);
-//            return false;
-//        });
-//        clickMenu.show();
-//    }
-
-
-//    @Override
-//    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
-//        return EnumUtils.menuInit(this, PwdContextActivityLongClickEnum.Delete, view, position);
-//    }
-    //endregion
-
-//    /**
-//     * 接收应用内的广播，当passwordDB内的数据变更时
-//     */
-//    private class PwdDBChangeReceiver extends BroadcastReceiver {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            System.out.println("已收到广播");
-//            if (intent != null) {
-//                UserItem userItem = JSON.parseObject(intent.getStringExtra("userItem"), UserItem.class);
-//                int currentItem = intent.getIntExtra("currentItem", -1);
-//                if (currentItem == -1) {
-//                    PasswordDB.init().getItems().add(userItem);
-//                    isDBChanged = true;
-//                } else if (PasswordDB.init().getItems().size() >= currentItem) {
-//                    PasswordDB.init().getItems().set(currentItem, userItem);
-//                    isDBChanged = true;
-//                }
-//                showLst();//重新载入列表
-//            }
-//        }
-//    }
 }

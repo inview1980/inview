@@ -1,24 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="rental_textView_context">
-        <item name="android:layout_marginEnd">3dp</item>
-        <item name="android:minWidth">80dp</item>
-        <item name="android:textSize">@dimen/rental_lable_textSize</item>
-    </style>
 
-    <style name="rental_textView_Lable">
-        <item name="android:textSize">@dimen/rental_lable_textSize</item>
-        <item name="android:layout_width">wrap_content</item>
+    <style name="rental_expandable_listview_item">
+        <item name="android:background">#0000</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/rental_label_textSize</item>
+        <item name="android:layout_columnWeight">@integer/rental_room_details_1width</item>
         <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:gravity">center</item>
     </style>
 
-    <style name="rental_add_edit">
-        <item name="android:layout_marginTop">5dp</item>
-        <item name="android:textSize">@dimen/rental_lable_textSize</item>
+    <style name="rental_room_details_tableRow">
+        <item name="android:layout_marginTop">@dimen/rent_room_details_tableRow_margin</item>
+        <item name="android:layout_marginBottom">@dimen/rent_room_details_tableRow_margin</item>
+        <item name="android:background">@android:color/white</item>
+    </style>
+
+    <style name="StateButtonStyle">
+        <item name="android:animationDuration">200</item>
+        <item name="android:radius">3dp</item>
+        <item name="android:layout_width">@dimen/pwdItemWidth</item>
+    </style>
+
+    <style name="iconFont_middle">
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_gravity">fill_horizontal</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/rental_main_gridview_title_fontsize</item>
     </style>
 
-    <dimen name="rental_lable_textSize">18dp</dimen>
+    <dimen name="rent_room_details_tableRow_margin">1dp</dimen>
 </resources>

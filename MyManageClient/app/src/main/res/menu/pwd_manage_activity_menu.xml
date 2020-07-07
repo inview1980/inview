@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/add"
+        android:icon="@drawable/ic_playlist_add_black_24dp"
+        android:orderInCategory="1"
+        android:title="@string/new_cn" />
+    <item
+        android:id="@+id/modify"
+        android:icon="@drawable/ic_mode_edit_black_24dp"
+        android:orderInCategory="2"
+        android:title="@string/change_password_cn" />
+    <item
+        android:id="@+id/resetPassword"
+        android:icon="@drawable/ic_file_download_black_24dp"
+        android:orderInCategory="3"
+        android:title="@string/restore_password_cn" />
+
+</menu>
