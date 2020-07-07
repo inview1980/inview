@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="red">#FF69B4</color>
+    <color name="white">#ffff</color>
+    <color name="grayWhite">#F5F5F5</color>
+    <color name="grayWhite2">#f9f9f9</color>
+    <color name="whiteGray">#75F5F5</color>
+    <color name="banana">#E3CF57</color>
+    <color name="grayBlue">#B0E0E6</color>
+    <color name="red1">#FFC0CB</color>
+
+    <color name="blue">#3396d8</color>
+
+    <color name="rentalMainGridViewTitleColor">#000456</color>
+</resources>
